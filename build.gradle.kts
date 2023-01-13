@@ -24,6 +24,10 @@ kotlin {
     jvmToolchain(17)
 }
 
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    kotlinOptions.jvmTarget = "17"
+}
+
 dependencies {
     implementation("org.javamoney:moneta:1.4.2")
     implementation("io.ktor:ktor-server-core-jvm:$ktor_version")
