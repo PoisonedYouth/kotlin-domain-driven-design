@@ -5,7 +5,7 @@ import com.poisonedyouth.PaymentInformationDto
 import com.poisonedyouth.UserDto
 import java.util.*
 
-data class User private constructor(
+class User private constructor(
     val username: String,
     val password: String,
     val contactDetails: ContactDetails,
@@ -20,63 +20,115 @@ data class User private constructor(
         }
     }
 
-    fun updatePassword(newPassword: String) = copy(
-        password = newPassword
+    fun updatePassword(newPassword: String) = User(
+        username = this.username,
+        password = newPassword,
+        contactDetails = this.contactDetails,
+        paymentInformation = this.paymentInformation,
+        transactions = this.transactions
     )
 
-    fun updateStreetNumber(newStreetNumber: String) = copy(
-        contactDetails = this.contactDetails.copy(
-            streetNumber = newStreetNumber
-        )
+    fun updateStreetNumber(newStreetNumber: String) = User(
+        username = this.username,
+        password = this.password,
+        contactDetails = ContactDetails(
+            street = this.contactDetails.street,
+            streetNumber = newStreetNumber,
+            zipCode = this.contactDetails.zipCode,
+            city = this.contactDetails.city
+        ),
+        paymentInformation = this.paymentInformation,
+        transactions = this.transactions
     )
 
-    fun updateStreet(newStreet: String) = copy(
-        contactDetails = this.contactDetails.copy(
-            street = newStreet
-        )
+    fun updateStreet(newStreet: String) = User(
+        username = this.username,
+        password = this.password,
+        contactDetails = ContactDetails(
+            street = newStreet,
+            streetNumber = this.contactDetails.streetNumber,
+            zipCode = this.contactDetails.zipCode,
+            city = this.contactDetails.city
+        ),
+        paymentInformation = this.paymentInformation,
+        transactions = this.transactions
     )
 
-    fun updateZipCode(newZipCode: Int) = copy(
-        contactDetails = this.contactDetails.copy(
-            zipCode = newZipCode
-        )
+    fun updateZipCode(newZipCode: Int) = User(
+        username = this.username,
+        password = this.password,
+        contactDetails = ContactDetails(
+            street = this.contactDetails.street,
+            streetNumber = this.contactDetails.streetNumber,
+            zipCode = newZipCode,
+            city = this.contactDetails.city
+        ),
+        paymentInformation = this.paymentInformation,
+        transactions = this.transactions
     )
 
-    fun updateCity(newCity: String) = copy(
-        contactDetails = this.contactDetails.copy(
+    fun updateCity(newCity: String) = User(
+        username = this.username,
+        password = this.password,
+        contactDetails = ContactDetails(
+            street = this.contactDetails.street,
+            streetNumber = this.contactDetails.streetNumber,
+            zipCode = this.contactDetails.zipCode,
             city = newCity
-        )
+        ),
+        paymentInformation = this.paymentInformation,
+        transactions = this.transactions
     )
 
-    fun addPaypalPayment(mailAddress: String) = copy(
+    fun addPaypalPayment(mailAddress: String) = User(
+        username = this.username,
+        password = this.password,
+        contactDetails = this.contactDetails,
         paymentInformation = this.paymentInformation + PaymentInformation.PaypalPaymentInformation(
             id = UUID.randomUUID(),
             mailAddress = mailAddress
-        )
+        ),
+        transactions = this.transactions
     )
 
-    fun addCreditCardPayment(number: String, owner: String, securityNumber: Int) = copy(
+    fun addCreditCardPayment(number: String, owner: String, securityNumber: Int) = User(
+        username = this.username,
+        password = this.password,
+        contactDetails = this.contactDetails,
         paymentInformation = this.paymentInformation + PaymentInformation.CreditCardPaymentInformation(
             id = UUID.randomUUID(),
             number = number,
             owner = owner,
             securityNumber = securityNumber
-        )
+        ),
+        transactions = this.transactions
     )
 
-    fun addBankPayment(iban: String, owner: String) = copy(
+    fun addBankPayment(iban: String, owner: String) = User(
+        username = this.username,
+        password = this.password,
+        contactDetails = this.contactDetails,
         paymentInformation = this.paymentInformation + PaymentInformation.BankPaymentInformation(
             id = UUID.randomUUID(),
             iban = iban,
             owner = owner,
-        )
+        ),
+        transactions = this.transactions
     )
 
-    fun removePaymentInformation(paymentInformationId: UUID) = copy(
-        paymentInformation = this.paymentInformation.filter { it.id != paymentInformationId }
+    fun removePaymentInformation(paymentInformationId: UUID) = User(
+        username = this.username,
+        password = this.password,
+        contactDetails = this.contactDetails,
+        paymentInformation = this.paymentInformation.filter { it.id != paymentInformationId },
+        transactions = this.transactions
     )
 
-    fun addTransaction(amount: Double, items: List<String>) = copy(
+    fun addTransaction(amount: Double, items: List<String>) = User(
+        username = this.username,
+        password = this.password,
+        contactDetails = this.contactDetails,
+        paymentInformation = this.paymentInformation,
         transactions = this.transactions + Transaction(
             transactionType = if (amount > 0) TransactionType.BUY else TransactionType.RETOURE,
             amount = amount,
@@ -128,7 +180,7 @@ data class User private constructor(
     }
 }
 
-data class ContactDetails(
+class ContactDetails(
     val street: String,
     val streetNumber: String,
     val zipCode: Int,
@@ -208,7 +260,7 @@ class Transaction(
     val transactionType: TransactionType,
     val amount: Double,
     val items: List<String>
-){
+) {
     init {
         require(items.isNotEmpty()) {
             "Items must not be empty."
